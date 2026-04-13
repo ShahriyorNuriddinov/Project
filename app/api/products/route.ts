@@ -1,8 +1,9 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/lib/db";
 import Product from "@/models/product";
+import { verifyToken } from "@/lib/auth";
 
-export async function GET(req: Request) {
+export async function GET(req: NextRequest) {
   try {
     await connectDB();
     const { searchParams } = new URL(req.url);
@@ -37,11 +38,17 @@ export async function GET(req: Request) {
   }
 }
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
+  // Faqat seller yoki admin product qo'sha oladi
+  const payload = await verifyToken(req);
+  if (!payload || (payload.role !== "seller" && payload.role !== "admin")) {
+    return NextResponse.json({ message: "Ruxsat yo'q" }, { status: 403 });
+  }
+
   try {
     await connectDB();
     const body = await req.json();
-    const newProduct = await Product.create(body);
+    const newProduct = await Product.create({ ...body, sellerId: payload.userId });
 
     return NextResponse.json(newProduct, { status: 201 });
   } catch (error: any) {

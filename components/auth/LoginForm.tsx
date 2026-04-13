@@ -6,7 +6,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { useRouter } from "next/navigation";
 import { useLoginMutation } from "@/hooks/useProducts";
 
 type LoginFormFields = {
@@ -15,7 +14,6 @@ type LoginFormFields = {
 };
 
 export default function LoginForm() {
-  const router = useRouter();
   const { mutate, isPending } = useLoginMutation();
   const {
     register,
@@ -25,11 +23,17 @@ export default function LoginForm() {
 
   const onSubmit: SubmitHandler<LoginFormFields> = (data) => {
     mutate(data, {
-      onSuccess: () => {
-        setTimeout(() => router.push("/profile"), 1500);
+      onSuccess: (res: any) => {
+        const role = res.user?.role;
+        if (role === "admin") window.location.href = "/admin";
+        else if (role === "seller") window.location.href = "/seller";
+        else window.location.href = "/";
+      },
+      onError: () => {
       },
     });
   };
+
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -51,12 +55,12 @@ export default function LoginForm() {
               id="email"
               type="email"
               placeholder="Your Email"
-              className={`bg-white border-gray-200 ${errors.email ? "border-red-500" : ""}`}
+              className={`text-bl ${errors.email ? "border-red-500" : ""}`}
               {...register("email", {
-                required: "Emailingizni kiriting",
+                required: "write your email",
                 pattern: {
                   value: /^\S+@\S+$/i,
-                  message: "Email xato",
+                  message: "error",
                 },
               })}
             />

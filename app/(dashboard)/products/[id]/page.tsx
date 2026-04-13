@@ -34,7 +34,7 @@ export default function ProductDetailPage() {
     } else {
       localStorage.setItem("cart", JSON.stringify([...products, { ...product, quantity: qty }]));
     }
-    toast.success("Mahsulot savatga qo'shildi");
+    toast.success("Adding");
   };
 
   if (isLoading) {

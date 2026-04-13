@@ -8,4 +8,5 @@ export interface ProductType {
   stock: number;
   oldPrice?: number;
   quantity: number;
+  
 }

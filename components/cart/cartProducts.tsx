@@ -21,7 +21,6 @@ const CartProducts = ({ products, removeProduct, handleIncrement, handleDecremen
         <span>Item</span>
         <span>Price</span>
         <span>Qty</span>
-        <span>Subtotal</span>
         <span />
       </div>
       {products.map((product, index) => (

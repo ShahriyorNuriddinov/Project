@@ -22,12 +22,10 @@ export default function ProductList() {
           ? Number(searchParams.get("maxPrice"))
           : undefined,
       };
-
       const data = await getProducts(params);
       setProducts(data);
       setLoading(false);
     };
-
     fetchData();
   }, [searchParams]);
 
@@ -49,7 +47,8 @@ export default function ProductList() {
           <ProductCard key={item._id} product={item} />
         ))
       ) : (
-        <p className="col-span-4 text-center py-20 text-gray-400 font-medium">Mahsulot topilmadi.</p>
+        <p className="col-span-4 text-center py-20 text-gray-400 font-medium"></p>
+                
       )}
     </div>
   );

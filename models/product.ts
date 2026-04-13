@@ -8,6 +8,7 @@ const ProductSchema = new mongoose.Schema({
   category: { type: String },
   oldPrice: { type: Number },
   stock: { type: Number, default: 0 },
+  sellerId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
 }, { timestamps: true });
 
 const Product = mongoose.models.Product || mongoose.model("Product", ProductSchema);

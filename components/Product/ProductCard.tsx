@@ -53,6 +53,7 @@ const ProductCard = ({ product }: ProductProps) => {
               <span className="text-sm text-muted-foreground line-through">${product.oldPrice}</span>
             )}
             <span className="text-lg font-semibold">${product.price}</span>
+            <span className="text-xs text-muted-foreground mt-1">Stock: {product.stock}</span>
           </div>
         </CardContent>
       </Card>

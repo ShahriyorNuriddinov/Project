@@ -6,7 +6,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useRegisterMutation } from "@/hooks/useProducts";
-import { useRouter } from "next/navigation";
 
 interface RegisterFormProps {
   onBack: () => void;
@@ -20,7 +19,6 @@ type FormFields = {
 
 export default function RegisterForm({ onBack }: RegisterFormProps) {
   const { mutate, isPending } = useRegisterMutation();
-  const router = useRouter();
 
   const {
     register,
@@ -30,12 +28,14 @@ export default function RegisterForm({ onBack }: RegisterFormProps) {
 
   const onSubmit: SubmitHandler<FormFields> = (data) => {
     mutate(data, {
-      onSuccess: () => {
-        setTimeout(() => router.push("/login"), 1500);
+      onSuccess: (res: any) => {
+        const role = res.user?.role;
+        if (role === "admin") window.location.href = "/admin";
+        else if (role === "seller") window.location.href = "/seller";
+        else window.location.href = "/";
       },
     });
   };
-
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <Card className="bg-[#eef2f7] ring-0 border-0 shadow-none rounded-xl">
@@ -55,7 +55,6 @@ export default function RegisterForm({ onBack }: RegisterFormProps) {
             <Input
               {...register("name", { required: "Ismingizni kiriting" })}
               placeholder="Your Name"
-              className="bg-white border-gray-200"
             />
             {errors.name && (
               <span className="text-red-500 text-xs">
@@ -69,15 +68,15 @@ export default function RegisterForm({ onBack }: RegisterFormProps) {
             </Label>
             <Input
               {...register("email", {
-                required: "Emailingizni kiriting",
+                required: "write email",
                 pattern: {
                   value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                  message: "Email hato yozilgan",
+                  message: "error email",
                 },
               })}
+              className="tex--black"
               type="email"
               placeholder="Your Email"
-              className="bg-white border-gray-200"
             />
             {errors.email && (
               <span className="text-red-500 text-xs">
@@ -97,9 +96,9 @@ export default function RegisterForm({ onBack }: RegisterFormProps) {
                   message: "Kamida 8 ta belgi bo'lishi kerak",
                 },
               })}
+              className="text-black"
               type="password"
               placeholder="Your Password"
-              className="bg-white border-gray-200"
             />
             {errors.password && (
               <span className="text-red-500 text-xs">

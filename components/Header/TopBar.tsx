@@ -23,6 +23,7 @@ const TopBar = () => {
             >
               Contact Us
             </Link>
+            <ModeToggle/>
           </p>
         </div>
         <div className="flex items-center gap-4">

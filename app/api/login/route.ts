@@ -3,6 +3,7 @@ import connectDB from "@/lib/db";
 import User from "@/models/user";
 import bcrypt from "bcryptjs";
 import { SignJWT } from "jose"
+
 export async function POST(req: Request) {
     try {
         await connectDB();
@@ -18,20 +19,29 @@ export async function POST(req: Request) {
         }
 
         const secret = new TextEncoder().encode(process.env.JWT_SECRET);
-        const token = await new SignJWT({ userId: user._id, email: user.email })
+        const token = await new SignJWT({ userId: user._id, email: user.email, role: user.role })
             .setProtectedHeader({ alg: "HS256" })
             .setExpirationTime("7d")
             .sign(secret);
 
-        return NextResponse.json({
+
+        const res = NextResponse.json({
             message: "Success",
             token,
-            user: { id: user._id, name: user.name, email: user.email }
+            user: { id: user._id, name: user.name, email: user.email, role: user.role }
         }, { status: 200 });
+
+        
+        res.cookies.set("token", token, {
+            httpOnly: false,
+            path: "/",
+            maxAge: 7 * 24 * 60 * 60,
+            sameSite: "lax",
+        });
+
+        return res;
     }
     catch (error: any) {
         return NextResponse.json({ message: error.message }, { status: 500 })
-
     }
-
-} 
+}

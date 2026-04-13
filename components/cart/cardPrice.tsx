@@ -1,7 +1,9 @@
-import { memo } from "react";
+"use client";
+import { memo, useState } from "react";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
   Accordion,
   AccordionContent,
@@ -9,12 +11,38 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Input } from "@/components/ui/input";
+import { CheckCircle2 } from "lucide-react";
+import axios from "axios";
+import { toast } from "react-toastify";
 
-const CardPrice = ({ total }: { total: number }) => {
+interface Props {
+  total: number;
+  cartItems: { _id?: string; id?: number; quantity: number }[];
+  onCheckoutSuccess: () => void;
+}
+
+const CardPrice = ({ total, cartItems, onCheckoutSuccess }: Props) => {
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+
   const shipping = 21.0;
   const tax = 1.91;
   const gst = 1.91;
   const orderTotal = total + shipping + tax + gst;
+
+  const handleCheckout = async () => {
+    setLoading(true);
+    try {
+      const items = cartItems.map((i) => ({ _id: (i as any)._id || i.id, quantity: i.quantity }));
+      await axios.post("/api/checkout", { items });
+      setOpen(true);
+      onCheckoutSuccess();
+    } catch {
+      toast.error("error");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="w-full lg:w-[340px] shrink-0">
@@ -69,7 +97,7 @@ const CardPrice = ({ total }: { total: number }) => {
               <div>
                 <p>Shipping</p>
                 <p className="text-[11px] leading-tight max-w-[160px] opacity-70">
-                  (Standard Rate - Price may vary depending on the item/destination. TCCS Staff will contact you.)
+                  (Standard Rate - Price may vary depending on the item/destination.)
                 </p>
               </div>
               <span>${shipping.toFixed(2)}</span>
@@ -91,8 +119,8 @@ const CardPrice = ({ total }: { total: number }) => {
             <span>${orderTotal.toFixed(2)}</span>
           </div>
 
-          <Button className="w-full rounded-full" size="lg">
-            Proceed to Checkout
+          <Button className="w-full rounded-full" size="lg" onClick={handleCheckout} disabled={loading || cartItems.length === 0}>
+            {loading ? "Processing..." : "Proceed to Checkout"}
           </Button>
 
           <Button
@@ -100,7 +128,7 @@ const CardPrice = ({ total }: { total: number }) => {
             size="lg"
             variant="outline"
           >
-            Check out with{" "}
+            Check out with
             <span className="ml-1">
               <span className="text-[#003087]">Pay</span>
               <span className="text-[#009cde]">Pal</span>
@@ -112,6 +140,25 @@ const CardPrice = ({ total }: { total: number }) => {
           </Button>
         </CardContent>
       </Card>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="max-w-sm text-center">
+          <DialogHeader>
+            <DialogTitle className="text-center">Order
+              seccucfully
+            </DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-col items-center gap-4 py-4">
+            <CheckCircle2 size={64} className="text-green-500" />
+            <p className="text-muted-foreground text-sm">
+            Seccesfull
+            </p>
+            <p className="font-bold text-lg">Total: ${orderTotal.toFixed(2)}</p>
+            <Button className="w-full rounded-full" onClick={() => { setOpen(false); window.location.href = "/"; }}>
+              Home
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

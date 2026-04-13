@@ -75,7 +75,10 @@ const Cart = () => {
             products={products}
             removeProduct={removeProduct}
           />
-          <CardPrice total={total} />
+          <CardPrice total={total} cartItems={products} onCheckoutSuccess={() => {
+            localStorage.removeItem("cart");
+            setProducts([]);
+          }} />
         </div>
       </section>
     </div>

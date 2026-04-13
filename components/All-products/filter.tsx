@@ -8,7 +8,7 @@ export function SidebarFilter() {
 
   const Min = Number(searchParams.get("minPrice")) || 0;
   const Max = Number(searchParams.get("maxPrice")) || 1000;
-
+  
   const updateFilter = (key: string, value: string) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set(key, value);

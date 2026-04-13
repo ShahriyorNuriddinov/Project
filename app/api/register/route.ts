@@ -32,15 +32,24 @@ export async function POST(req: Request) {
         });
 
         const secret = new TextEncoder().encode(process.env.JWT_SECRET);
-        const token = await new SignJWT({ userId: user._id, email: user.email })
+        const token = await new SignJWT({ userId: user._id, email: user.email, role: user.role })
             .setProtectedHeader({ alg: "HS256" })
             .setExpirationTime("7d")
             .sign(secret);
 
-        return NextResponse.json(
-            { message: "Succeess", token, user: { id: user._id, name: user.name, email: user.email } },
+        const res = NextResponse.json(
+            { message: "Success", token, user: { id: user._id, name: user.name, email: user.email, role: user.role } },
             { status: 201 }
         );
+
+        res.cookies.set("token", token, {
+            httpOnly: false,
+            path: "/",
+            maxAge: 7 * 24 * 60 * 60,
+            sameSite: "lax",
+        });
+
+        return res;
 
     } catch (error: any) {
         console.error("Error", error.message);

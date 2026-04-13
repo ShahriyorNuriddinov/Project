@@ -18,6 +18,7 @@ export const useProducts = (params?: {
 export const useCreateProduct = () => {
   const queryClient = useQueryClient();
   return useMutation({
+    mutationKey: ["add-products"],
     mutationFn: createProduct,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["products"] });
@@ -32,6 +33,7 @@ export const useGetProductById = (id: string) => {
   });
 }
 
+
 export const useRegisterMutation = () => {
   return useMutation({
     mutationKey: ["register"],
@@ -44,12 +46,12 @@ export const useRegisterMutation = () => {
       return res.data;
     },
     onSuccess(data) {
+      toast.success("success")
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
-      toast.success("Success");
     },
     onError() {
-      toast.error("Error");
+      toast.error("error");
     },
   });
 };
@@ -66,12 +68,57 @@ export const useLoginMutation = () => {
       return res.data;
     },
     onSuccess(data: any) {
+      toast.success("success")
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
-      toast.success("Success");
     },
     onError() {
-      toast.error("Error");
+      toast.error("error")
     },
+  });
+};
+
+import { updateProduct, deleteProduct } from "../services/product.price";
+
+export const useUpdateProduct = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: updateProduct,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+    },
+  });
+};
+
+
+export const useDeleteProduct = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: deleteProduct,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+    },
+  });
+};
+
+import { getSellers, createSeller, deleteSeller } from "../services/product.price";
+
+export const useSellers = () => {
+  return useQuery({ queryKey: ["sellers"], queryFn: getSellers });
+};
+
+export const useCreateSeller = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: createSeller,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["sellers"] }),
+  });
+};
+
+export const useDeleteSeller = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: deleteSeller,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["sellers"] }),
   });
 };
